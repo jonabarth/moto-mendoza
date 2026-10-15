@@ -5,7 +5,7 @@ Sitio estático para practicar el teórico de moto, con 383 preguntas y 221 fich
 ## Publicar en GitHub Pages
 
 1. Creá un repositorio en GitHub (o usá uno existente).
-2. Subí **el contenido de esta carpeta** a la raíz: `index.html`, `styles.css`, `questions.js`, `official-signs.js`, `course-questions.js`, `course-guide.js`, `app.js`, la carpeta `assets/`, `favicon.svg`, `.nojekyll` y este README. El archivo `index.html` tiene que quedar en la raíz de la carpeta que publiques.
+2. Subí **el contenido de esta carpeta** a la raíz: `index.html`, `styles.css`, `questions.js`, `official-signs.js`, `course-questions.js`, `course-guide.js`, `question-review.js`, `app.js`, la carpeta `assets/`, `favicon.svg`, `.nojekyll` y este README. El archivo `index.html` tiene que quedar en la raíz de la carpeta que publiques.
 3. En el repositorio abrí **Settings → Pages**.
 4. En **Build and deployment**, elegí **Deploy from a branch**.
 5. Elegí la rama `main` y la carpeta **/ (root)**, y guardá.
@@ -44,17 +44,17 @@ Las fichas usan imágenes del catálogo oficial enlazado por San Rafael y dos ej
 
 ## Editar el banco
 
-`questions.js` contiene `SOURCES`, `QUESTIONS` y `SIGNS`. Se carga primero, seguido por `official-signs.js`, `course-questions.js`, `course-guide.js` y finalmente `app.js`. Conservá ese orden para mantener los IDs publicados. La función `add` recibe tema, ámbito (`mendoza`, `national` o `common`), pregunta, respuesta correcta, dos distractores, explicación, clave de fuente, referencia y señal opcional. La correcta tiene ID `a` en los datos; la interfaz mezcla su posición independientemente. Conservá los IDs al editar un banco ya publicado para no asociar progreso viejo a preguntas diferentes. Si cambiás IDs o estructura, cambiá también la clave de almacenamiento de `app.js`.
+`questions.js` contiene `SOURCES`, `QUESTIONS` y `SIGNS`. Se carga primero, seguido por `official-signs.js`, `course-questions.js`, `course-guide.js`, `question-review.js` y finalmente `app.js`. Conservá ese orden para mantener los IDs publicados. La función `add` recibe tema, ámbito (`mendoza`, `national` o `common`), pregunta, respuesta correcta, dos distractores, explicación, clave de fuente, referencia y señal opcional. La correcta tiene ID `a` en los datos; la interfaz mezcla su posición independientemente. Conservá los IDs al editar un banco ya publicado para no asociar progreso viejo a preguntas diferentes. Si cambiás IDs o estructura, cambiá también la clave de almacenamiento de `app.js`.
 
 ## Complemento del curso
 
 Se prepararon 67 preguntas nuevas en total (q317–q383): 43 del trabajo previo y 24 de la revisión del aula. Se descargó el PDF del aula (105 páginas) y se revisaron transcripciones automáticas de sus once videos: introducción más diez módulos. No se reprodujeron sus evaluaciones ni se revisó cada fotograma. Ver [REVISION-CURSO.md](REVISION-CURSO.md).
 
-El filtro **Material de estudio** distingue todo, curso ANSV, material de San Rafael y la unión de ambos. El curso reúne 63 preguntas elaboradas directamente con su contenido (61 al combinar con Mendoza + temas comunes). San Rafael reúne 224 preguntas del catálogo enlazado, guía práctica y Estrellas Amarillas; no todo ese contenido es exclusivo de ese municipio. La unión tiene 287 (285 con el filtro inicial de jurisdicción). Las preguntas de género basadas solo en una descripción pública no se etiquetan como contenido del aula revisada.
+El filtro **Material de estudio** distingue todo, curso ANSV, material de San Rafael y la unión de ambos. El curso reúne 263 preguntas: 63 de texto y 200 de señales vinculadas al módulo 7 (261 al combinar con Mendoza + temas comunes). La correspondencia de cada señal con el PDF del aula se indica tras responder; el catálogo puede mostrar variantes del mismo concepto. San Rafael reúne 224 preguntas del catálogo enlazado, guía práctica y Estrellas Amarillas; no todo ese contenido es exclusivo de ese municipio. La unión tiene 287 (285 con el filtro inicial de jurisdicción). Las preguntas de género basadas solo en una descripción pública no se etiquetan como contenido del aula revisada.
 
-La clasificación por origen es independiente del tema. Las preguntas del curso sobre siniestros se contrastaron con fuentes sanitarias y normativas actuales. Práctica libre, simulacro, errores y guardadas respetan el origen seleccionado. La guía por módulos ofrece videos, páginas del PDF y ejercicios relacionados por tema; esa relación amplia no los incorpora automáticamente al filtro exclusivo del curso.
+La clasificación por origen es independiente del tema. Las preguntas del curso sobre siniestros se contrastaron con fuentes sanitarias y normativas actuales. Práctica libre, simulacro, errores y guardadas respetan el origen seleccionado. La guía por módulos ofrece videos, páginas del PDF y ejercicios del módulo. Si no hay preguntas propias, las relacionadas de otras fuentes se identifican expresamente.
 
-Iniciá una nueva práctica para incluir el contenido nuevo; un intento guardado mantiene su conjunto original. Publicación aprobada por el usuario el 15/10/2026.
+La segunda revisión renueva automáticamente los intentos de la redacción anterior, conserva sus filtros, errores y guardadas e informa del cambio. La publicación de la primera revisión fue aprobada el 15/10/2026; la publicación de esta segunda revisión fue aprobada el 15/10/2026.
 
 ## Validación
 
@@ -81,3 +81,11 @@ Las imágenes oficiales se extrajeron del PDF, sin redibujar su simbología. Se 
 `official-signs.js` amplía el banco y carga las referencias de imágenes. Los recursos son locales: al subir o descargar el sitio, conservá la carpeta `assets/` con sus subcarpetas y el PDF. El PDF y sus imágenes proceden de https://www.sanrafael.gov.ar/archivos-muni/licencias-de-conducir/sistema-de-senalizacion-vial-uniforme-ansv.pdf (ANSV, Anexo L). Se incluyen como material de estudio y no como señalización para instalar en la vía pública.
 
 Para incorporar el banco completo a un nuevo intento, pulsá **Nueva práctica** o **Practicar todas las señales**. El intento guardado anteriormente conserva su conjunto de preguntas.
+
+## Corrección de señales y dificultad · segunda revisión
+
+`question-review.js` cruza 200 señales del catálogo con las páginas del módulo 7 y revisa la redacción u opciones de 377 preguntas sin cambiar los 383 IDs. Se conservan las 221 fichas y todas sus preguntas. Los distractores de reconocimiento se agrupan por conceptos cercanos y se conservan casos de interpretación (PARE frente a CEDA EL PASO, prohibiciones, máximas/mínimas, demarcaciones). Las preguntas de texto usan confusiones sobre componentes, controles, secuencias y condiciones, en lugar de alternativas decorativas o absurdas. No se afirma que la dificultad sea equivalente al examen oficial; no se cambió la normativa por el solo hecho de aumentar la exigencia.
+
+El recuento junto al filtro indica preguntas e imágenes elegibles; el intento indica cuántas de sus preguntas tienen imagen de señal. El selector no reproduce el cuestionario de Buenos Aires: se agregó un acceso directo al PDF oficial. Elegir Nación no selecciona preguntas de ese gobierno.
+
+Ver [REVISION-CALIDAD.md](REVISION-CALIDAD.md) para cifras, límites y validación.

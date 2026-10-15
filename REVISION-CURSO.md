@@ -1,6 +1,6 @@
 # Revisión del curso ANSV para moto
 
-15/10/2026. Revisión aprobada por el usuario para publicar.
+15/10/2026. La primera revisión fue publicada con aprobación. Segunda revisión: señales y dificultad, publicación aprobada. Ver REVISION-CALIDAD.md.
 
 ## Material consultado
 
@@ -35,13 +35,13 @@ La pestaña Curso oficial enlaza PDF y videos, indica páginas y ofrece pregunta
 ## Filtro por origen solicitado
 
 - Todo el material: 383 preguntas; 376 con Mendoza + comunes.
-- Curso ANSV: 63 preguntas elaboradas directamente con el PDF o videos; 61 con Mendoza + comunes. Las preguntas sanitarias y legales del módulo 9 se contrastaron con fuentes actuales.
+- Curso ANSV: 263 preguntas: las 63 de texto y 200 con señales vinculadas al módulo 7; 261 con Mendoza + comunes. Las preguntas sanitarias y legales del módulo 9 se contrastaron con fuentes actuales.
 - San Rafael: 224 preguntas del catálogo de señales enlazado por el municipio, guía práctica y Estrellas Amarillas.
 - Curso + San Rafael: unión sin duplicados, 287 preguntas; 285 con Mendoza + comunes.
 
-Los orígenes no se asignan por semejanza de tema. Las preguntas de género sustentadas únicamente en una presentación pública quedan en el banco general, sin etiqueta del aula revisada. Las fuentes de San Rafael pueden ser materiales nacionales alojados o enlazados por el municipio: la etiqueta no significa exclusividad municipal.
+Las 200 señales tienen correspondencia revisada con páginas del PDF, incluidas variantes del mismo concepto. Los demás orígenes no se asignan por semejanza de tema. Las preguntas de género sustentadas únicamente en una presentación pública quedan en el banco general, sin etiqueta del aula revisada. Las fuentes de San Rafael pueden ser materiales nacionales alojados o enlazados por el municipio: la etiqueta no significa exclusividad municipal.
 
-Todos los modos respetan el filtro, y preguntas/opciones se mezclan al iniciar. Las favoritas y errores se conservan entre cambios de filtro. Los intentos previos conservan sus preguntas; hace falta Nueva práctica para usar la ampliación.
+Todos los modos respetan el filtro, y preguntas/opciones se mezclan al iniciar. Las favoritas y errores se conservan entre cambios de filtro. En la segunda revisión, los intentos anteriores se renuevan automáticamente para no conservar preguntas con redacción anterior ni excluir las señales. Se mantienen filtros, errores y favoritas.
 
 ## Diferencias que requieren contexto
 

@@ -7,6 +7,13 @@
   const modes = {practice:'PRÁCTICA LIBRE',exam:'SIMULACRO DE ENTRENAMIENTO',errors:'REPASO DE ERRORES',bookmarks:'PREGUNTAS GUARDADAS'};
   const materials={all:'Todo el material',course:'Solo curso ANSV',sanrafael:'Solo material de San Rafael',localcourse:'Curso ANSV + San Rafael'};
   function matchesMaterial(q,origin){return origin==='all'||(origin==='localcourse'?q.materials.some(x=>x==='course'||x==='sanrafael'):q.materials.includes(origin));}
+  let updateFilters=null;
+  function materialNote(){
+    const origin=$('#material').value,scope=$('#scope').value,topic=$('#topic').value;
+    const eligible=QUESTIONS.filter(q=>matchesMaterial(q,origin)&&(scope==='all'||q.scope==='common'||q.scope===scope)&&(topic==='all'||q.topic===topic));
+    const total=QUESTIONS.filter(q=>matchesMaterial(q,origin)).length;
+    $('#material-note').textContent=`${eligible.length} preguntas con estos filtros · ${eligible.filter(q=>q.sign).length} con imagen de señal. El material reúne ${total} preguntas antes de filtrar tema y jurisdicción. Pulsá Nueva práctica para aplicarlos.`;
+  }
   let state = {errors:[],bookmarks:[],session:null};
   let storageOK = true;
   try {
@@ -18,7 +25,11 @@
       if(s && modes[s.mode] && Array.isArray(s.items) && s.items.length && Number.isInteger(s.index) && s.index>=0 && s.index<s.items.length && s.items.every(item => {
         const q=bank.get(item.id);
         return q && Array.isArray(item.order) && item.order.length===q.options.length && new Set(item.order).size===q.options.length && item.order.every(id=>q.options.some(o=>o.id===id)) && (item.answer===null || q.options.some(o=>o.id===item.answer));
-      }) && (s.material===undefined || Object.hasOwn(materials,s.material))) {s.material=s.material||'all';state.session=s;}
+      }) && (s.material===undefined || Object.hasOwn(materials,s.material))) {
+        s.material=s.material||'all';
+        if(s.bankRevision===(window.QUESTION_REVIEW?.version||'1'))state.session=s;
+        else updateFilters={mode:s.mode,material:s.material,scope:s.scope,topic:s.topic};
+      }
     }
   } catch { storageOK=false; }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{storageOK=false;} showStorage();}
@@ -42,14 +53,15 @@
       while(chosen.length<40 && groups.some(g=>g.length))for(const g of groups){if(g.length&&chosen.length<40)chosen.push(g.pop());}
       chosen=shuffle(chosen);
     }
-    state.session=chosen.length?{mode,scope,topic,material,index:0,finished:false,items:chosen.map(q=>({id:q.id,order:shuffle(q.options.map(o=>o.id)),answer:null}))}:null;
-    save();render();
+    state.session=chosen.length?{mode,scope,topic,material,bankRevision:window.QUESTION_REVIEW?.version||'1',index:0,finished:false,items:chosen.map(q=>({id:q.id,order:shuffle(q.options.map(o=>o.id)),answer:null}))}:null;
+    save();render();materialNote();
   }
   function current(){return state.session?.items[state.session.index];}
   function stats(){const items=state.session?.items||[];const answered=items.filter(i=>i.answer!==null);const good=answered.filter(i=>i.answer===bank.get(i.id).correct).length;$('#answered-stat').textContent=answered.length;$('#accuracy-stat').textContent=answered.length?Math.round(good/answered.length*100)+'%':'—';$('#errors-stat').textContent=state.errors.length;}
   function render(){
     stats();
     const s=state.session;
+    $('#session-composition').textContent=s?`Este intento incluye ${s.items.filter(item=>bank.get(item.id).sign).length} preguntas con imagen de señal.`:'';
     $('#question-navigation').classList.toggle('hidden',!s||s.finished);
     $('.question-map').classList.toggle('hidden',!s);
     $('#session-label').textContent=(s?modes[s.mode]:modes[$('#mode').value])+' · '+materials[s?.material||$('#material').value];
@@ -71,7 +83,7 @@
     $('#previous').disabled=s.index===0;
     $('#next').textContent=s.index===s.items.length-1?'Ver resultado →':'Siguiente →';
   }
-  function feedback(q,item){const good=item.answer===q.correct;return `<div class="feedback ${good?'':'wrong'}" role="status"><strong>${good?'✓ ¡Correcto!':'✕ Esta no era la respuesta.'}</strong>${!good?`<p><strong>Respuesta correcta:</strong> ${escape(q.options.find(o=>o.id===q.correct).text)}</p>`:''}<p>${escape(q.explanation)}</p><a href="${SOURCES[q.source].url}" target="_blank" rel="noopener noreferrer">${escape(SOURCES[q.source].title)} · ${escape(q.ref)} ↗</a></div>`;}
+  function feedback(q,item){const good=item.answer===q.correct;return `<div class="feedback ${good?'':'wrong'}" role="status"><strong>${good?'✓ ¡Correcto!':'✕ Esta no era la respuesta.'}</strong>${!good?`<p><strong>Respuesta correcta:</strong> ${escape(q.options.find(o=>o.id===q.correct).text)}</p>`:''}<p>${escape(q.explanation)}</p><a href="${SOURCES[q.source].url}" target="_blank" rel="noopener noreferrer">${escape(SOURCES[q.source].title)} · ${escape(q.ref)} ↗</a>${q.coursePage?`<p class="micro">También en el módulo 7: <a href="${SOURCES.cursoaula.url}#page=${q.coursePage}" target="_blank" rel="noopener noreferrer">PDF del aula · pág. ${q.coursePage} ↗</a>. La imagen del catálogo puede mostrar una variante del mismo concepto.</p>`:''}</div>`;}
   function answer(id){const item=current();if(!item||item.answer!==null||state.session.finished)return;const q=bank.get(item.id);if(!q.options.some(o=>o.id===id))return;item.answer=id;if(id===q.correct)state.errors=state.errors.filter(x=>x!==q.id);else if(!state.errors.includes(q.id))state.errors.push(q.id);save();render();$('#next').focus();}
   function renderMap(){const s=state.session;$('#map-count').textContent=`· ${s.items.filter(i=>i.answer!==null).length} de ${s.items.length} respondidas`;$('#question-grid').innerHTML=s.items.map((item,i)=>`<button class="q-jump ${i===s.index?'current':''} ${item.answer===null?'':item.answer===bank.get(item.id).correct?'good':'bad'} ${state.bookmarks.includes(item.id)?'marked':''}" data-jump="${i}" aria-label="Pregunta ${i+1}, ${item.answer===null?'sin responder':item.answer===bank.get(item.id).correct?'correcta':'incorrecta'}" ${i===s.index?'aria-current="step"':''}>${i+1}</button>`).join('');document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{s.index=Number(b.dataset.jump);s.finished=false;save();render();focusQuestion();});}
   function focusQuestion(){$('#question-heading')?.focus({preventScroll:true});if(window.innerWidth<651)$('#quiz-area').scrollIntoView({behavior:'auto',block:'start'});}
@@ -110,10 +122,27 @@
   $('#sign-search').oninput=gallery;$('#sign-category').onchange=gallery;
   $('#clear-sign-filters').onclick=()=>{$('#sign-search').value='';$('#sign-category').value='all';gallery();};
   $('#practice-signs').onclick=()=>{$('#material').value='all';$('#mode').value='practice';$('#topic').value='Señales y marcas';$('#scope').value='mendoza';start();view('practice');focusQuestion();};
-  function moduleQuestions(m){return QUESTIONS.filter(q=>q.courseModule===m.id || (m.id!==0 && m.topics.includes(q.topic)));}
-  $('#course-modules').innerHTML=COURSE_MODULES.map(m=>{const count=moduleQuestions(m).filter(q=>q.scope!=='national').length;return `<article class="method-card course-card"><span class="tag">${m.id===0?'PRESENTACIÓN':'MÓDULO '+m.id}</span><h3>${escape(m.title)}</h3><p>${escape(m.summary)}</p><p class="micro">PDF del aula · páginas ${escape(m.pages)}</p><div class="course-links"><a href="https://www.youtube.com/watch?v=${m.video}" target="_blank" rel="noopener noreferrer">Ver video ↗</a><a href="${SOURCES.cursoaula.url}#page=${m.pages.split('–')[0]}" target="_blank" rel="noopener noreferrer">PDF del aula ↗</a></div>${count?`<button class="secondary" data-course-module="${m.id}">Practicar · ${count} preguntas</button>`:'<p class="micro">Presentación del curso, sin práctica propia.</p>'}</article>`;}).join('');
-  document.querySelectorAll('[data-course-module]').forEach(b=>b.onclick=()=>{const m=COURSE_MODULES.find(m=>m.id===Number(b.dataset.courseModule));$('#material').value='all';$('#mode').value='practice';$('#topic').value='all';$('#scope').value='mendoza';start({onlyIds:moduleQuestions(m).map(q=>q.id),forcePractice:true});view('practice');focusQuestion();});
+  function moduleQuestions(m){return QUESTIONS.filter(q=>q.courseModule===m.id);}
+  function relatedQuestions(m){return QUESTIONS.filter(q=>m.topics.includes(q.topic));}
+  $('#course-modules').innerHTML=COURSE_MODULES.map(m=>{
+    const direct=moduleQuestions(m),pool=direct.length?direct:relatedQuestions(m);
+    return `<article class="method-card course-card"><span class="tag">${m.id===0?'PRESENTACIÓN':'MÓDULO '+m.id}</span><h3>${escape(m.title)}</h3><p>${escape(m.summary)}</p><p class="micro">PDF del aula · páginas ${escape(m.pages)}</p><div class="course-links"><a href="https://www.youtube.com/watch?v=${m.video}" target="_blank" rel="noopener noreferrer">Ver video ↗</a><a href="${SOURCES.cursoaula.url}#page=${m.pages.split('–')[0]}" target="_blank" rel="noopener noreferrer">PDF del aula ↗</a></div>${pool.length?`${direct.length?'':'<p class="micro">Estas preguntas relacionadas proceden de otras fuentes del banco.</p>'}<button class="secondary" data-course-module="${m.id}" data-related="${direct.length?'no':'yes'}">${direct.length?'Practicar este módulo':'Practicar relacionadas'} · ${pool.length}</button>`:'<p class="micro">Presentación del curso, sin práctica propia.</p>'}</article>`;
+  }).join('');
+  document.querySelectorAll('[data-course-module]').forEach(b=>b.onclick=()=>{
+    const m=COURSE_MODULES.find(m=>m.id===Number(b.dataset.courseModule)),related=b.dataset.related==='yes';
+    $('#material').value=related?'all':'course';$('#mode').value='practice';$('#topic').value='all';$('#scope').value='all';
+    start({onlyIds:(related?relatedQuestions(m):moduleQuestions(m)).map(q=>q.id),forcePractice:true});view('practice');focusQuestion();
+  });
+  for(const id of ['material','topic','scope'])$('#'+id).addEventListener('change',materialNote);
   $('#sources-list').innerHTML=[...['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].map(k=>SOURCES[k]),...Object.entries(SOURCES).filter(([k])=>!['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].includes(k)).map(([,v])=>v)].map(s=>`<article class="source-item"><h3><a href="${s.url}" target="_blank" rel="noopener noreferrer">${escape(s.title)} ↗</a></h3><p>${escape(s.note)}</p></article>`).join('');
+  if(updateFilters){
+    if(Object.hasOwn(materials,updateFilters.material))$('#material').value=updateFilters.material;
+    if(Object.hasOwn(modes,updateFilters.mode))$('#mode').value=updateFilters.mode;
+    if([...$('#scope').options].some(o=>o.value===updateFilters.scope))$('#scope').value=updateFilters.scope;
+    if([...$('#topic').options].some(o=>o.value===updateFilters.topic))$('#topic').value=updateFilters.topic;
+    $('#bank-update-note').textContent='Actualizamos las preguntas y corregimos las señales del filtro del curso. Iniciamos un intento nuevo con tus filtros para incluir estos cambios. Tus errores y preguntas guardadas se conservan.';
+    $('#bank-update-note').classList.remove('hidden');
+  }
   if(state.session){$('#material').value=state.session.material;$('#mode').value=state.session.mode;$('#topic').value=state.session.topic;$('#scope').value=state.session.scope;render();}else start();
-  gallery();showStorage();view('practice');
+  gallery();showStorage();materialNote();view('practice');
 })();
