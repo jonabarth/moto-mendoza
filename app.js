@@ -5,6 +5,8 @@
   const bank = new Map(QUESTIONS.map(q => [q.id, q]));
   const scopes = {mendoza:'Mendoza',national:'Nación',common:'Tema común'};
   const modes = {practice:'PRÁCTICA LIBRE',exam:'SIMULACRO DE ENTRENAMIENTO',errors:'REPASO DE ERRORES',bookmarks:'PREGUNTAS GUARDADAS'};
+  const materials={all:'Todo el material',course:'Solo curso ANSV',sanrafael:'Solo material de San Rafael',localcourse:'Curso ANSV + San Rafael'};
+  function matchesMaterial(q,origin){return origin==='all'||(origin==='localcourse'?q.materials.some(x=>x==='course'||x==='sanrafael'):q.materials.includes(origin));}
   let state = {errors:[],bookmarks:[],session:null};
   let storageOK = true;
   try {
@@ -16,7 +18,7 @@
       if(s && modes[s.mode] && Array.isArray(s.items) && s.items.length && Number.isInteger(s.index) && s.index>=0 && s.index<s.items.length && s.items.every(item => {
         const q=bank.get(item.id);
         return q && Array.isArray(item.order) && item.order.length===q.options.length && new Set(item.order).size===q.options.length && item.order.every(id=>q.options.some(o=>o.id===id)) && (item.answer===null || q.options.some(o=>o.id===item.answer));
-      })) state.session=s;
+      }) && (s.material===undefined || Object.hasOwn(materials,s.material))) {s.material=s.material||'all';state.session=s;}
     }
   } catch { storageOK=false; }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{storageOK=false;} showStorage();}
@@ -27,8 +29,8 @@
   function signMedia(s,quiz=false){return s.image?`<img src="${s.image}" alt="${quiz?'':escape(s.name)}" ${quiz?'':'loading="lazy"'} decoding="async">`:s.svg;}
   function start({onlyIds,forcePractice=false}={}){
     const mode=forcePractice?'practice':$('#mode').value;
-    const scope=$('#scope').value,topic=$('#topic').value;
-    let pool=QUESTIONS.filter(q=>(scope==='all'||q.scope==='common'||q.scope===scope)&&(topic==='all'||q.topic===topic));
+    const scope=$('#scope').value,topic=$('#topic').value,material=$('#material').value;
+    let pool=QUESTIONS.filter(q=>(scope==='all'||q.scope==='common'||q.scope===scope)&&(topic==='all'||q.topic===topic)&&matchesMaterial(q,material));
     if(onlyIds) pool=pool.filter(q=>onlyIds.includes(q.id));
     if(mode==='errors')pool=pool.filter(q=>state.errors.includes(q.id));
     if(mode==='bookmarks')pool=pool.filter(q=>state.bookmarks.includes(q.id));
@@ -40,7 +42,7 @@
       while(chosen.length<40 && groups.some(g=>g.length))for(const g of groups){if(g.length&&chosen.length<40)chosen.push(g.pop());}
       chosen=shuffle(chosen);
     }
-    state.session=chosen.length?{mode,scope,topic,index:0,finished:false,items:chosen.map(q=>({id:q.id,order:shuffle(q.options.map(o=>o.id)),answer:null}))}:null;
+    state.session=chosen.length?{mode,scope,topic,material,index:0,finished:false,items:chosen.map(q=>({id:q.id,order:shuffle(q.options.map(o=>o.id)),answer:null}))}:null;
     save();render();
   }
   function current(){return state.session?.items[state.session.index];}
@@ -50,7 +52,7 @@
     const s=state.session;
     $('#question-navigation').classList.toggle('hidden',!s||s.finished);
     $('.question-map').classList.toggle('hidden',!s);
-    $('#session-label').textContent=s?modes[s.mode]:modes[$('#mode').value];
+    $('#session-label').textContent=(s?modes[s.mode]:modes[$('#mode').value])+' · '+materials[s?.material||$('#material').value];
     if(!s){$('#position').textContent='0 preguntas';$('#progress-fill').style.width='0%';$('#question-card').innerHTML='<div class="empty"><p class="eyebrow">TODO LISTO PARA PRACTICAR</p><h2>No hay preguntas con estos filtros.</h2><p>Si elegiste errores o guardadas, primero respondé o guardá preguntas. También podés cambiar el tema o la jurisdicción.</p><button class="primary" id="empty-start">Ir a práctica libre</button></div>';$('#empty-start').onclick=()=>{$('#mode').value='practice';$('#topic').value='all';start();};return;}
     const answered=s.items.filter(i=>i.answer!==null).length;
     $('#position').textContent=`${s.index+1} / ${s.items.length}`;
@@ -74,8 +76,8 @@
   function renderMap(){const s=state.session;$('#map-count').textContent=`· ${s.items.filter(i=>i.answer!==null).length} de ${s.items.length} respondidas`;$('#question-grid').innerHTML=s.items.map((item,i)=>`<button class="q-jump ${i===s.index?'current':''} ${item.answer===null?'':item.answer===bank.get(item.id).correct?'good':'bad'} ${state.bookmarks.includes(item.id)?'marked':''}" data-jump="${i}" aria-label="Pregunta ${i+1}, ${item.answer===null?'sin responder':item.answer===bank.get(item.id).correct?'correcta':'incorrecta'}" ${i===s.index?'aria-current="step"':''}>${i+1}</button>`).join('');document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{s.index=Number(b.dataset.jump);s.finished=false;save();render();focusQuestion();});}
   function focusQuestion(){$('#question-heading')?.focus({preventScroll:true});if(window.innerWidth<651)$('#quiz-area').scrollIntoView({behavior:'auto',block:'start'});}
   function finish(){if(!state.session)return;state.session.finished=true;save();render();$('#results-heading')?.focus();}
-  function results(){const s=state.session;const answered=s.items.filter(i=>i.answer!==null),good=answered.filter(i=>i.answer===bank.get(i.id).correct).length;const wrong=answered.length-good;$('#position').textContent='INTENTO FINALIZADO';const topics=[...new Set(s.items.map(i=>bank.get(i.id).topic))];$('#question-card').innerHTML=`<div class="results"><p class="eyebrow">CADA INTENTO SUMA</p><h2 id="results-heading" tabindex="-1">Tu práctica, en perspectiva.</h2><div class="score">${Math.round(good/s.items.length*100)}<small style="font-size:28px">%</small></div><p><strong>${good} correctas</strong> · ${wrong} incorrectas · ${s.items.length-answered.length} sin responder</p><p class="micro">Porcentaje sobre todas las preguntas del intento. Es una referencia de estudio; no certifica aprobación del examen oficial.</p><div class="result-breakdown">${topics.map(t=>{const group=s.items.filter(i=>bank.get(i.id).topic===t);return `<p><span>${escape(t)}</span><strong>${group.filter(i=>i.answer===bank.get(i.id).correct).length} / ${group.length}</strong></p>`;}).join('')}</div><div class="result-actions"><button class="primary" id="retry">Repetir y mezclar ↻</button><button class="secondary" id="review-errors" ${wrong?'':'disabled'}>Practicar estos errores</button><button class="text-button" id="review-attempt">Revisar el intento</button></div></div>`;$('#retry').onclick=()=>start({onlyIds:s.items.map(i=>i.id),forcePractice:s.mode==='errors'||s.mode==='bookmarks'});$('#review-errors').onclick=()=>{const ids=answered.filter(i=>i.answer!==bank.get(i.id).correct).map(i=>i.id);$('#mode').value='practice';start({onlyIds:ids,forcePractice:true});};$('#review-attempt').onclick=()=>{s.finished=false;s.index=0;save();render();focusQuestion();};}
-  function view(name){for(const v of ['practice','signs','method','sources'])$(`#${v}-view`).classList.toggle('hidden',name!==v);document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.view===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
+  function results(){const s=state.session;const answered=s.items.filter(i=>i.answer!==null),good=answered.filter(i=>i.answer===bank.get(i.id).correct).length;const wrong=answered.length-good;$('#position').textContent='INTENTO FINALIZADO';const topics=[...new Set(s.items.map(i=>bank.get(i.id).topic))];$('#question-card').innerHTML=`<div class="results"><p class="eyebrow">CADA INTENTO SUMA</p><h2 id="results-heading" tabindex="-1">Tu práctica, en perspectiva.</h2><div class="score">${Math.round(good/s.items.length*100)}<small style="font-size:28px">%</small></div><p><strong>${good} correctas</strong> · ${wrong} incorrectas · ${s.items.length-answered.length} sin responder</p><p class="micro">Porcentaje sobre todas las preguntas del intento. Es una referencia de estudio; no certifica aprobación del examen oficial.</p><div class="result-breakdown">${topics.map(t=>{const group=s.items.filter(i=>bank.get(i.id).topic===t);return `<p><span>${escape(t)}</span><strong>${group.filter(i=>i.answer===bank.get(i.id).correct).length} / ${group.length}</strong></p>`;}).join('')}</div><div class="result-actions"><button class="primary" id="retry">Repetir y mezclar ↻</button><button class="secondary" id="review-errors" ${wrong?'':'disabled'}>Practicar estos errores</button><button class="text-button" id="review-attempt">Revisar el intento</button></div></div>`;$('#retry').onclick=()=>{$('#mode').value=s.mode;$('#topic').value=s.topic;$('#scope').value=s.scope;$('#material').value=s.material;start({onlyIds:s.items.map(i=>i.id),forcePractice:s.mode==='errors'||s.mode==='bookmarks'});};$('#review-errors').onclick=()=>{const ids=answered.filter(i=>i.answer!==bank.get(i.id).correct).map(i=>i.id);$('#mode').value='practice';$('#topic').value=s.topic;$('#scope').value=s.scope;$('#material').value=s.material;start({onlyIds:ids,forcePractice:true});};$('#review-attempt').onclick=()=>{s.finished=false;s.index=0;save();render();focusQuestion();};}
+  function view(name){for(const v of ['practice','signs','course','method','sources'])$(`#${v}-view`).classList.toggle('hidden',name!==v);document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.view===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>view(b.dataset.view));
   const topics=[...new Set(QUESTIONS.map(q=>q.topic))].sort((a,b)=>a.localeCompare(b,'es'));
   for(const t of topics){const o=document.createElement('option');o.value=t;o.textContent=t;$('#topic').append(o);}
@@ -85,8 +87,8 @@
   $('#finish').onclick=finish;
   $('#reset').onclick=()=>$('#reset-dialog').showModal();
   $('#cancel-reset').onclick=()=>$('#reset-dialog').close();
-  $('#confirm-reset').onclick=()=>{state={errors:[],bookmarks:[],session:null};$('#mode').value='practice';$('#topic').value='all';$('#scope').value='mendoza';$('#reset-dialog').close();start();focusQuestion();};
-  function practiceSign(id){const q=QUESTIONS.find(q=>q.sign===id);if(!q)return;$('#mode').value='practice';$('#topic').value='all';start({onlyIds:[q.id],forcePractice:true});view('practice');focusQuestion();}
+  $('#confirm-reset').onclick=()=>{state={errors:[],bookmarks:[],session:null};$('#mode').value='practice';$('#topic').value='all';$('#scope').value='mendoza';$('#material').value='all';$('#reset-dialog').close();start();focusQuestion();};
+  function practiceSign(id){const q=QUESTIONS.find(q=>q.sign===id);if(!q)return;$('#material').value='all';$('#mode').value='practice';$('#topic').value='all';start({onlyIds:[q.id],forcePractice:true});view('practice');focusQuestion();}
   function inspectSign(id){const s=SIGNS.find(s=>s.id===id);if(!s)return;$('#sign-detail').innerHTML=`<p class="eyebrow">${escape(s.category)}</p><h2>${escape(s.name)}</h2><div class="sign-detail-image">${signMedia(s)}</div><p>${escape(s.meaning)}</p><p class="micro">${s.official?`Imagen extraída del catálogo oficial · página ${s.page}${s.code?' · '+escape(s.code):''}`:'Ejemplo adicional ilustrado para estudio.'}</p><div class="result-actions"><button class="primary" id="detail-practice">Practicar esta señal ↗</button>${s.page?'<button class="secondary" id="detail-page">Ver lámina completa</button>':''}</div>`;$('#detail-practice').onclick=()=>{$('#sign-dialog').close();practiceSign(s.id);};if(s.page)$('#detail-page').onclick=()=>{$('#sign-dialog').close();openSheet(s.page);};$('#sign-dialog').showModal();}
   function gallery(){
     const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -107,8 +109,11 @@
   $('#previous-sheet').onclick=()=>openSheet(sheetNumber-1);$('#next-sheet').onclick=()=>openSheet(sheetNumber+1);
   $('#sign-search').oninput=gallery;$('#sign-category').onchange=gallery;
   $('#clear-sign-filters').onclick=()=>{$('#sign-search').value='';$('#sign-category').value='all';gallery();};
-  $('#practice-signs').onclick=()=>{$('#mode').value='practice';$('#topic').value='Señales y marcas';$('#scope').value='mendoza';start();view('practice');focusQuestion();};
+  $('#practice-signs').onclick=()=>{$('#material').value='all';$('#mode').value='practice';$('#topic').value='Señales y marcas';$('#scope').value='mendoza';start();view('practice');focusQuestion();};
+  function moduleQuestions(m){return QUESTIONS.filter(q=>q.courseModule===m.id || (m.id!==0 && m.topics.includes(q.topic)));}
+  $('#course-modules').innerHTML=COURSE_MODULES.map(m=>{const count=moduleQuestions(m).filter(q=>q.scope!=='national').length;return `<article class="method-card course-card"><span class="tag">${m.id===0?'PRESENTACIÓN':'MÓDULO '+m.id}</span><h3>${escape(m.title)}</h3><p>${escape(m.summary)}</p><p class="micro">PDF del aula · páginas ${escape(m.pages)}</p><div class="course-links"><a href="https://www.youtube.com/watch?v=${m.video}" target="_blank" rel="noopener noreferrer">Ver video ↗</a><a href="${SOURCES.cursoaula.url}#page=${m.pages.split('–')[0]}" target="_blank" rel="noopener noreferrer">PDF del aula ↗</a></div>${count?`<button class="secondary" data-course-module="${m.id}">Practicar · ${count} preguntas</button>`:'<p class="micro">Presentación del curso, sin práctica propia.</p>'}</article>`;}).join('');
+  document.querySelectorAll('[data-course-module]').forEach(b=>b.onclick=()=>{const m=COURSE_MODULES.find(m=>m.id===Number(b.dataset.courseModule));$('#material').value='all';$('#mode').value='practice';$('#topic').value='all';$('#scope').value='mendoza';start({onlyIds:moduleQuestions(m).map(q=>q.id),forcePractice:true});view('practice');focusQuestion();});
   $('#sources-list').innerHTML=[...['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].map(k=>SOURCES[k]),...Object.entries(SOURCES).filter(([k])=>!['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].includes(k)).map(([,v])=>v)].map(s=>`<article class="source-item"><h3><a href="${s.url}" target="_blank" rel="noopener noreferrer">${escape(s.title)} ↗</a></h3><p>${escape(s.note)}</p></article>`).join('');
-  if(state.session){$('#mode').value=state.session.mode;$('#topic').value=state.session.topic;$('#scope').value=state.session.scope;render();}else start();
+  if(state.session){$('#material').value=state.session.material;$('#mode').value=state.session.mode;$('#topic').value=state.session.topic;$('#scope').value=state.session.scope;render();}else start();
   gallery();showStorage();view('practice');
 })();

@@ -1,11 +1,11 @@
 # En dos ruedas · Mendoza
 
-Sitio estático para practicar el teórico de moto, con 316 preguntas y 221 fichas de señales, símbolos o demarcaciones (311 preguntas con el filtro inicial de Mendoza y temas comunes). Sin instalación, backend, claves ni compilación. Incluye corrección inmediata con explicación y fuente, preguntas de Mendoza y Nación diferenciadas, señales SVG locales, temas, simulacro de hasta 40 preguntas, repaso de errores y favoritos.
+Sitio estático para practicar el teórico de moto, con 383 preguntas y 221 fichas de señales, símbolos o demarcaciones (376 preguntas con el filtro inicial de Mendoza y temas comunes). Sin instalación, backend, claves ni compilación. Incluye corrección inmediata con explicación y fuente, preguntas de Mendoza y Nación diferenciadas, imágenes locales, temas, simulacro de hasta 40 preguntas, repaso de errores y favoritos.
 
 ## Publicar en GitHub Pages
 
 1. Creá un repositorio en GitHub (o usá uno existente).
-2. Subí **el contenido de esta carpeta** a la raíz: `index.html`, `styles.css`, `questions.js`, `official-signs.js`, `app.js`, la carpeta `assets/`, `favicon.svg`, `.nojekyll` y este README. El archivo `index.html` tiene que quedar en la raíz de la carpeta que publiques.
+2. Subí **el contenido de esta carpeta** a la raíz: `index.html`, `styles.css`, `questions.js`, `official-signs.js`, `course-questions.js`, `course-guide.js`, `app.js`, la carpeta `assets/`, `favicon.svg`, `.nojekyll` y este README. El archivo `index.html` tiene que quedar en la raíz de la carpeta que publiques.
 3. En el repositorio abrí **Settings → Pages**.
 4. En **Build and deployment**, elegí **Deploy from a branch**.
 5. Elegí la rama `main` y la carpeta **/ (root)**, y guardá.
@@ -44,7 +44,17 @@ Las fichas usan imágenes del catálogo oficial enlazado por San Rafael y dos ej
 
 ## Editar el banco
 
-`questions.js` contiene `SOURCES`, `QUESTIONS` y `SIGNS`. La función `add` recibe tema, ámbito (`mendoza`, `national` o `common`), pregunta, respuesta correcta, dos distractores, explicación, clave de fuente, referencia y señal opcional. La correcta tiene ID `a` en los datos; la interfaz mezcla su posición independientemente. Conservá los IDs al editar un banco ya publicado para no asociar progreso viejo a preguntas diferentes. Si cambiás IDs o estructura, cambiá también la clave de almacenamiento de `app.js`.
+`questions.js` contiene `SOURCES`, `QUESTIONS` y `SIGNS`. Se carga primero, seguido por `official-signs.js`, `course-questions.js`, `course-guide.js` y finalmente `app.js`. Conservá ese orden para mantener los IDs publicados. La función `add` recibe tema, ámbito (`mendoza`, `national` o `common`), pregunta, respuesta correcta, dos distractores, explicación, clave de fuente, referencia y señal opcional. La correcta tiene ID `a` en los datos; la interfaz mezcla su posición independientemente. Conservá los IDs al editar un banco ya publicado para no asociar progreso viejo a preguntas diferentes. Si cambiás IDs o estructura, cambiá también la clave de almacenamiento de `app.js`.
+
+## Complemento del curso
+
+Se prepararon 67 preguntas nuevas en total (q317–q383): 43 del trabajo previo y 24 de la revisión del aula. Se descargó el PDF del aula (105 páginas) y se revisaron transcripciones automáticas de sus once videos: introducción más diez módulos. No se reprodujeron sus evaluaciones ni se revisó cada fotograma. Ver [REVISION-CURSO.md](REVISION-CURSO.md).
+
+El filtro **Material de estudio** distingue todo, curso ANSV, material de San Rafael y la unión de ambos. El curso reúne 63 preguntas elaboradas directamente con su contenido (61 al combinar con Mendoza + temas comunes). San Rafael reúne 224 preguntas del catálogo enlazado, guía práctica y Estrellas Amarillas; no todo ese contenido es exclusivo de ese municipio. La unión tiene 287 (285 con el filtro inicial de jurisdicción). Las preguntas de género basadas solo en una descripción pública no se etiquetan como contenido del aula revisada.
+
+La clasificación por origen es independiente del tema. Las preguntas del curso sobre siniestros se contrastaron con fuentes sanitarias y normativas actuales. Práctica libre, simulacro, errores y guardadas respetan el origen seleccionado. La guía por módulos ofrece videos, páginas del PDF y ejercicios relacionados por tema; esa relación amplia no los incorpora automáticamente al filtro exclusivo del curso.
+
+Iniciá una nueva práctica para incluir el contenido nuevo; un intento guardado mantiene su conjunto original. Publicación aprobada por el usuario el 15/10/2026.
 
 ## Validación
 
