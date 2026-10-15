@@ -7,7 +7,7 @@
   <title>En dos ruedas · Moto en San Rafael, Mendoza</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
-  <script defer src="./questions.js"></script><script defer src="./app.js"></script>
+  <script defer src="./questions.js"></script><script defer src="./official-signs.js"></script><script defer src="./app.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Ir al contenido</a>
@@ -20,7 +20,15 @@
       <div id="quiz-area"><div class="quiz-top"><span id="session-label">PRÁCTICA LIBRE</span><span id="position"></span></div><div class="progress" aria-label="Progreso"><div id="progress-fill"></div></div><article id="question-card" class="question-card"></article><div id="question-navigation" class="question-navigation"><button id="previous" class="secondary">← Anterior</button><button id="finish" class="text-button">Terminar intento</button><button id="next" class="primary">Siguiente →</button></div><details class="question-map"><summary>Ir a una pregunta <span id="map-count"></span></summary><div id="question-grid"></div><p class="micro">Verde: correcta · Rojo: incorrecta · Punto: guardada</p></details></div>
     </div><div class="local-note"><span>↳</span><p><strong>Estudiá con el contexto correcto.</strong> Las reglas de Mendoza pueden diferir de las nacionales. Cada pregunta indica su ámbito y muestra la fuente después de responder. Simulacro de entrenamiento: cantidad y puntaje no representan el examen oficial.</p></div>
   </section>
-  <section id="signs-view" class="hidden"><div class="section-heading"><div><p class="eyebrow">MIRAR, RECONOCER, RECORDAR</p><h2>El lenguaje del camino.</h2></div><label>Buscar señal<input type="search" id="sign-search" placeholder="Ej.: pare, curva, velocidad…"></label></div><p class="muted">Ilustraciones vectoriales de estudio. Abrí una señal para practicar su significado.</p><div id="sign-gallery" class="sign-gallery"></div></section>
+  <section id="signs-view" class="hidden">
+    <div class="section-heading"><div><p class="eyebrow">CATÁLOGO COMPLETO · MATERIAL DE SAN RAFAEL</p><h2>El lenguaje del camino.</h2></div><button class="primary" id="practice-signs">Practicar todas las señales ↗</button></div>
+    <p class="muted">Incluye las 219 entradas visuales de las láminas 2 a 22 del catálogo oficial, con sus variantes, más dos ejemplos adicionales. Ninguna se excluye por una estimación de qué podrían preguntar.</p>
+    <div class="catalog-toolbar"><label>Buscar señal<input type="search" id="sign-search" placeholder="Ej.: rotonda, puente, ruta, niebla…"></label><label for="sign-category">Organizar por categoría<select id="sign-category"><option value="all">Todas las categorías</option></select></label><button class="secondary" id="clear-sign-filters">Mostrar todas</button></div>
+    <p id="sign-count" class="micro" role="status"></p>
+    <div class="catalog-links"><a href="./assets/catalogo-oficial-san-rafael.pdf" target="_blank" rel="noopener">Abrir PDF completo · 27 páginas ↗</a><a href="https://www.sanrafael.gov.ar/archivos-muni/licencias-de-conducir/sistema-de-senalizacion-vial-uniforme-ansv.pdf" target="_blank" rel="noopener noreferrer">Consultar la fuente municipal ↗</a></div>
+    <details class="complete-sheets"><summary>Consultar las 27 láminas completas, sin recortes</summary><p class="micro">Se conservan también portada, recomendaciones y cierre. Las categorías organizan el estudio; no indican si una señal puede o no aparecer en tu examen.</p><div id="catalog-pages" class="catalog-pages"></div></details>
+    <div id="sign-gallery" class="sign-gallery"></div>
+  </section>
   <section id="method-view" class="hidden">
     <p class="eyebrow">TU CENTRO EMISOR · SAN RAFAEL</p><h2>Cómo prepararte para rendir.</h2>
     <p class="muted">Fuentes consultadas el 15/10/2026. Separá el trámite local, la referencia nacional y el entrenamiento de esta página.</p>
@@ -37,4 +45,6 @@
 </main>
 <footer><span class="brand-footer">en dos ruedas ↗</span><span>Hecho para aprender. Preparado para GitHub Pages.</span></footer>
 <dialog id="reset-dialog"><h2>¿Empezar de cero?</h2><p>Se borrarán las respuestas, los errores y las preguntas guardadas en este navegador. Se iniciará otra práctica con un orden nuevo.</p><div class="dialog-actions"><button id="cancel-reset" class="secondary">Cancelar</button><button id="confirm-reset" class="primary">Sí, borrar y reiniciar</button></div></dialog>
+<dialog id="sign-dialog"><button class="secondary dialog-close" id="close-sign">Cerrar ×</button><div id="sign-detail"></div></dialog>
+<dialog id="catalog-dialog"><div class="sheet-heading"><button class="secondary" id="close-catalog">Cerrar ×</button><strong id="sheet-title"></strong><a id="sheet-original" target="_blank" rel="noopener">Abrir imagen ↗</a></div><img id="sheet-image" alt=""><div class="sheet-controls"><button class="secondary" id="previous-sheet">← Anterior</button><button class="secondary" id="next-sheet">Siguiente →</button></div></dialog>
 </body></html>

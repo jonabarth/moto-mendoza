@@ -1,11 +1,11 @@
 # En dos ruedas · Mendoza
 
-Sitio estático para practicar el teórico de moto, con 120 preguntas y 25 señales o demarcaciones ilustradas (115 preguntas con el filtro inicial de Mendoza y temas comunes). Sin instalación, backend, claves ni compilación. Incluye corrección inmediata con explicación y fuente, preguntas de Mendoza y Nación diferenciadas, señales SVG locales, temas, simulacro de hasta 40 preguntas, repaso de errores y favoritos.
+Sitio estático para practicar el teórico de moto, con 316 preguntas y 221 fichas de señales, símbolos o demarcaciones (311 preguntas con el filtro inicial de Mendoza y temas comunes). Sin instalación, backend, claves ni compilación. Incluye corrección inmediata con explicación y fuente, preguntas de Mendoza y Nación diferenciadas, señales SVG locales, temas, simulacro de hasta 40 preguntas, repaso de errores y favoritos.
 
 ## Publicar en GitHub Pages
 
 1. Creá un repositorio en GitHub (o usá uno existente).
-2. Subí **el contenido de esta carpeta** a la raíz: `index.html`, `styles.css`, `questions.js`, `app.js`, `favicon.svg`, `.nojekyll` y este README. El archivo `index.html` tiene que quedar en la raíz de la carpeta que publiques.
+2. Subí **el contenido de esta carpeta** a la raíz: `index.html`, `styles.css`, `questions.js`, `official-signs.js`, `app.js`, la carpeta `assets/`, `favicon.svg`, `.nojekyll` y este README. El archivo `index.html` tiene que quedar en la raíz de la carpeta que publiques.
 3. En el repositorio abrí **Settings → Pages**.
 4. En **Build and deployment**, elegí **Deploy from a branch**.
 5. Elegí la rama `main` y la carpeta **/ (root)**, y guardá.
@@ -40,7 +40,7 @@ Las preguntas provinciales de velocidad se basan en el art. 60 de la Ley 9024 en
 
 El compendio corresponde a 2020 aunque esté alojado en una carpeta de 2024. No se afirma que todos sus contenidos sigan vigentes. Para alcohol se distingue el texto provincial consultado (art. 52 inc. 7) del nacional actualizado (art. 48 inc. a). La opción segura es no beber si vas a conducir. No se incluyen montos de multas ni requisitos detallados de licencias potencialmente desactualizados. Verificá los cambios normativos y requisitos con el centro emisor antes de rendir.
 
-Las señales son ilustraciones vectoriales propias para estudio; no son láminas oficiales para imprimir como señalización vial. Los nombres y significados se contrastaron con el material enlazado. No hay recursos visuales externos que puedan dejar de cargar.
+Las fichas usan imágenes del catálogo oficial enlazado por San Rafael y dos ejemplos vectoriales adicionales. Todo se guarda como recurso local para evitar enlaces de imágenes rotos. La atribución y el alcance están descritos en la sección del catálogo íntegro.
 
 ## Editar el banco
 
@@ -59,3 +59,15 @@ La pestaña **Rendir en San Rafael** distingue cursos y fuentes municipales de l
 El simulacro selecciona hasta 40 preguntas con un reparto propio para incluir temas variados. Mantiene corrección inmediata. No reproduce cupos oficiales, casos a desarrollar ni un listado oficial de eliminatorias, ni incorpora cronómetro. Si el filtro tiene menos de 40, utiliza las disponibles. La meta de 90% se presenta como orientación, sin certificar aprobación.
 
 Se incorporaron técnicas y equipamiento del manual de Rivadavia, sin importar sus tablas de velocidad ni sus requisitos de licencias. El material de San Rafael sobre pista es una guía alojada por el municipio, no una confirmación del trazado vigente en cada turno.
+
+## Catálogo íntegro de señales (15/10/2026)
+
+Se incorporan las **219 entradas visuales** de las páginas 2 a 22 del Sistema de Señalización Vial Uniforme enlazado por San Rafael, sin excluir señales por su categoría, tipo de vehículo o supuesta probabilidad de aparecer en el examen. Se mantienen dos ejemplos adicionales (Estrella Amarilla y una curva ilustrada): **221 fichas y 316 preguntas** en total.
+
+Las categorías sirven para organizar. Al abrir la pestaña se muestran todas las fichas; el buscador y la selección de categoría son opcionales y **Mostrar todas** restablece la vista completa. Cada ficha permite ampliar su imagen, practicarla y abrir su lámina de origen. Se conserva el PDF original y sus **27 páginas completas**, incluidas portada, recomendaciones y cierre, para poder comprobar el contexto y la cobertura.
+
+Las imágenes oficiales se extrajeron del PDF, sin redibujar su simbología. Se reemplazaron 23 ilustraciones coincidentes conservando sus IDs; se agregaron las otras 196 entradas como preguntas nuevas al final. Los valores de las preguntas visuales de velocidad se ajustaron a las imágenes oficiales (90 máxima y 35 mínima). Las láminas contienen variantes o ejemplos compuestos; el número de entradas no implica 219 significados únicos ni cubre toda futura modificación normativa. El alcance exacto es el catálogo municipal enlazado.
+
+`official-signs.js` amplía el banco y carga las referencias de imágenes. Los recursos son locales: al subir o descargar el sitio, conservá la carpeta `assets/` con sus subcarpetas y el PDF. El PDF y sus imágenes proceden de https://www.sanrafael.gov.ar/archivos-muni/licencias-de-conducir/sistema-de-senalizacion-vial-uniforme-ansv.pdf (ANSV, Anexo L). Se incluyen como material de estudio y no como señalización para instalar en la vía pública.
+
+Para incorporar el banco completo a un nuevo intento, pulsá **Nueva práctica** o **Practicar todas las señales**. El intento guardado anteriormente conserva su conjunto de preguntas.

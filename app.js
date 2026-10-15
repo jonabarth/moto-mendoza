@@ -24,6 +24,7 @@
   // Fisher–Yates con aleatoriedad del navegador; IDs independientes del orden.
   function shuffle(array){const a=[...array];for(let i=a.length-1;i>0;i--){let n;if(window.crypto?.getRandomValues){const u=new Uint32Array(1);const limit=Math.floor(4294967296/(i+1))*(i+1);do{crypto.getRandomValues(u);}while(u[0]>=limit);n=u[0]%(i+1);}else{n=Math.floor(Math.random()*(i+1));}[a[i],a[n]]=[a[n],a[i]];}return a;}
   function escape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function signMedia(s,quiz=false){return s.image?`<img src="${s.image}" alt="${quiz?'':escape(s.name)}" ${quiz?'':'loading="lazy"'} decoding="async">`:s.svg;}
   function start({onlyIds,forcePractice=false}={}){
     const mode=forcePractice?'practice':$('#mode').value;
     const scope=$('#scope').value,topic=$('#topic').value;
@@ -58,7 +59,7 @@
     if(s.finished){results();return;}
     const item=current(),q=bank.get(item.id),isAnswered=item.answer!==null;
     const sign=SIGNS.find(x=>x.id===q.sign);
-    $('#question-card').innerHTML=`<div class="question-meta"><span class="tag">${escape(q.topic)}</span><span class="scope-tag">${scopes[q.scope]}</span><button class="bookmark ${state.bookmarks.includes(q.id)?'saved':''}" aria-pressed="${state.bookmarks.includes(q.id)}" id="bookmark">${state.bookmarks.includes(q.id)?'★ Guardada':'☆ Guardar'}</button></div><h2 tabindex="-1" id="question-heading">${escape(q.prompt)}</h2>${sign?`<div class="question-image" role="img" aria-label="Señal de tránsito para identificar. El significado se informa después de responder.">${sign.svg}</div>`:''}<div class="options" role="group" aria-labelledby="question-heading">${item.order.map((id,i)=>{
+    $('#question-card').innerHTML=`<div class="question-meta"><span class="tag">${escape(q.topic)}</span><span class="scope-tag">${scopes[q.scope]}</span><button class="bookmark ${state.bookmarks.includes(q.id)?'saved':''}" aria-pressed="${state.bookmarks.includes(q.id)}" id="bookmark">${state.bookmarks.includes(q.id)?'★ Guardada':'☆ Guardar'}</button></div><h2 tabindex="-1" id="question-heading">${escape(q.prompt)}</h2>${sign?`<div class="question-image" role="img" aria-label="Señal de tránsito para identificar. El significado se informa después de responder.">${signMedia(sign,true)}</div>`:''}<div class="options" role="group" aria-labelledby="question-heading">${item.order.map((id,i)=>{
       const option=q.options.find(o=>o.id===id);
       const good=isAnswered&&id===q.correct,bad=isAnswered&&item.answer===id&&!good;
       return `<button class="option ${good?'correct':''} ${bad?'wrong':''}" data-option="${id}" ${isAnswered?'disabled':''}><span class="option-letter">${String.fromCharCode(65+i)}</span><span>${escape(option.text)}</span>${good?'<span class="answer-mark" aria-label="Respuesta correcta">✓</span>':bad?'<span class="answer-mark" aria-label="Respuesta incorrecta">✕</span>':''}</button>`;
@@ -85,8 +86,28 @@
   $('#reset').onclick=()=>$('#reset-dialog').showModal();
   $('#cancel-reset').onclick=()=>$('#reset-dialog').close();
   $('#confirm-reset').onclick=()=>{state={errors:[],bookmarks:[],session:null};$('#mode').value='practice';$('#topic').value='all';$('#scope').value='mendoza';$('#reset-dialog').close();start();focusQuestion();};
-  function gallery(){const query=$('#sign-search').value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();const found=SIGNS.filter(s=>(s.name+' '+s.category).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(query));$('#sign-gallery').innerHTML=found.length?found.map(s=>`<button class="sign-tile" data-sign="${s.id}"><span role="img" aria-label="${escape(s.name)}">${s.svg}</span><span class="tag">${s.category}</span><strong>${escape(s.name)}</strong><p>${escape(s.meaning)}</p><span class="micro">Practicar esta señal ↗</span></button>`).join(''):'<p>No se encontraron señales.</p>';document.querySelectorAll('[data-sign]').forEach(b=>b.onclick=()=>{const q=QUESTIONS.find(q=>q.sign===b.dataset.sign);$('#mode').value='practice';$('#topic').value='all';start({onlyIds:[q.id],forcePractice:true});view('practice');focusQuestion();});}
-  $('#sign-search').oninput=gallery;
+  function practiceSign(id){const q=QUESTIONS.find(q=>q.sign===id);if(!q)return;$('#mode').value='practice';$('#topic').value='all';start({onlyIds:[q.id],forcePractice:true});view('practice');focusQuestion();}
+  function inspectSign(id){const s=SIGNS.find(s=>s.id===id);if(!s)return;$('#sign-detail').innerHTML=`<p class="eyebrow">${escape(s.category)}</p><h2>${escape(s.name)}</h2><div class="sign-detail-image">${signMedia(s)}</div><p>${escape(s.meaning)}</p><p class="micro">${s.official?`Imagen extraída del catálogo oficial · página ${s.page}${s.code?' · '+escape(s.code):''}`:'Ejemplo adicional ilustrado para estudio.'}</p><div class="result-actions"><button class="primary" id="detail-practice">Practicar esta señal ↗</button>${s.page?'<button class="secondary" id="detail-page">Ver lámina completa</button>':''}</div>`;$('#detail-practice').onclick=()=>{$('#sign-dialog').close();practiceSign(s.id);};if(s.page)$('#detail-page').onclick=()=>{$('#sign-dialog').close();openSheet(s.page);};$('#sign-dialog').showModal();}
+  function gallery(){
+    const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    const query=norm($('#sign-search').value),category=$('#sign-category').value;
+    const found=SIGNS.filter(s=>(category==='all'||s.category===category)&&norm(s.name+' '+s.category+' '+(s.code||'')).includes(query));
+    $('#sign-count').textContent=`Mostrando ${found.length} de ${SIGNS.length} fichas · 219 entradas oficiales y 2 ejemplos adicionales. Incluye variantes.`;
+    $('#sign-gallery').innerHTML=found.length?found.map(s=>`<article class="sign-tile"><button class="sign-open" data-inspect="${s.id}" aria-label="Ampliar: ${escape(s.name)}">${signMedia(s)}<strong>${escape(s.name)}</strong></button><span class="tag">${escape(s.category)}</span><p>${escape(s.meaning)}</p><p class="micro">${s.official?`Catálogo oficial · pág. ${s.page}`:'Ejemplo adicional'}</p><div class="sign-actions"><button class="text-button" data-sign="${s.id}">Practicar ↗</button>${s.page?`<button class="text-button" data-sheet="${s.page}">Ver lámina ${s.page}</button>`:''}</div></article>`).join(''):'<p>No se encontraron señales. Pulsá “Mostrar todas” para recuperar el catálogo completo.</p>';
+    document.querySelectorAll('[data-sign]').forEach(b=>b.onclick=()=>practiceSign(b.dataset.sign));
+    document.querySelectorAll('[data-inspect]').forEach(b=>b.onclick=()=>inspectSign(b.dataset.inspect));
+    document.querySelectorAll('#sign-gallery [data-sheet]').forEach(b=>b.onclick=()=>openSheet(Number(b.dataset.sheet)));
+  }
+  let sheetNumber=1;
+  function openSheet(n){sheetNumber=Math.max(1,Math.min(27,n));const p=CATALOG_PAGES[sheetNumber-1];$('#sheet-title').textContent=`Lámina ${sheetNumber} de 27`;$('#sheet-image').src=p.image;$('#sheet-image').alt=`Página ${sheetNumber} del catálogo oficial de señalización vial enlazado por San Rafael`;$('#sheet-original').href=p.image;$('#previous-sheet').disabled=sheetNumber===1;$('#next-sheet').disabled=sheetNumber===27;if(!$('#catalog-dialog').open)$('#catalog-dialog').showModal();}
+  for(const category of [...new Set(SIGNS.map(s=>s.category))]){const o=document.createElement('option');o.value=category;o.textContent=`${category} (${SIGNS.filter(s=>s.category===category).length})`;$('#sign-category').append(o);}
+  $('#catalog-pages').innerHTML=CATALOG_PAGES.map(p=>`<button class="sheet-thumb" data-sheet="${p.number}"><img src="${p.image}" alt="" loading="lazy" decoding="async"><span>Lámina ${p.number}</span></button>`).join('');
+  document.querySelectorAll('#catalog-pages [data-sheet]').forEach(b=>b.onclick=()=>openSheet(Number(b.dataset.sheet)));
+  $('#close-sign').onclick=()=>$('#sign-dialog').close();$('#close-catalog').onclick=()=>$('#catalog-dialog').close();
+  $('#previous-sheet').onclick=()=>openSheet(sheetNumber-1);$('#next-sheet').onclick=()=>openSheet(sheetNumber+1);
+  $('#sign-search').oninput=gallery;$('#sign-category').onchange=gallery;
+  $('#clear-sign-filters').onclick=()=>{$('#sign-search').value='';$('#sign-category').value='all';gallery();};
+  $('#practice-signs').onclick=()=>{$('#mode').value='practice';$('#topic').value='Señales y marcas';$('#scope').value='mendoza';start();view('practice');focusQuestion();};
   $('#sources-list').innerHTML=[...['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].map(k=>SOURCES[k]),...Object.entries(SOURCES).filter(([k])=>!['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].includes(k)).map(([,v])=>v)].map(s=>`<article class="source-item"><h3><a href="${s.url}" target="_blank" rel="noopener noreferrer">${escape(s.title)} ↗</a></h3><p>${escape(s.note)}</p></article>`).join('');
   if(state.session){$('#mode').value=state.session.mode;$('#topic').value=state.session.topic;$('#scope').value=state.session.scope;render();}else start();
   gallery();showStorage();view('practice');
