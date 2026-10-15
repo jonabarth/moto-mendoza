@@ -1,6 +1,6 @@
 # En dos ruedas · Mendoza
 
-Sitio estático para practicar el teórico de moto, con 84 preguntas y 21 señales o demarcaciones ilustradas (79 preguntas con el filtro inicial de Mendoza y temas comunes). Sin instalación, backend, claves ni compilación. Incluye corrección inmediata con explicación y fuente, preguntas de Mendoza y Nación diferenciadas, señales SVG locales, temas, simulacro de hasta 20 preguntas, repaso de errores y favoritos.
+Sitio estático para practicar el teórico de moto, con 120 preguntas y 25 señales o demarcaciones ilustradas (115 preguntas con el filtro inicial de Mendoza y temas comunes). Sin instalación, backend, claves ni compilación. Incluye corrección inmediata con explicación y fuente, preguntas de Mendoza y Nación diferenciadas, señales SVG locales, temas, simulacro de hasta 40 preguntas, repaso de errores y favoritos.
 
 ## Publicar en GitHub Pages
 
@@ -32,9 +32,9 @@ Podés abrir `index.html` directamente. Para que el guardado sea más consistent
 
 ## Contenido y fuentes
 
-Fuentes consultadas el **15/10/2026**. La pestaña **Fuentes y reglas locales** enlaza el compendio municipal solicitado, el cuestionario de GBA, Test de Conducir, las leyes y referencias oficiales adicionales. Cada corrección tiene una fuente y un artículo o apartado para revisar.
+Fuentes consultadas el **15/10/2026**. La pestaña **Fuentes y reglas locales** enlaza el compendio municipal solicitado, el cuestionario de GBA, Test de Conducir, las leyes y referencias oficiales adicionales, con prioridad para el material de San Rafael. Cada corrección tiene una fuente y un artículo o apartado para revisar.
 
-Es material educativo independiente, de redacción propia: **no es un banco oficial ni garantiza aprobar**. El simulacro de 20 preguntas y su porcentaje son decisiones de entrenamiento, no una descripción del examen del municipio. El cuestionario de Buenos Aires sirve como referencia de temas y señales; no se importan sus reglas locales a Mendoza. Test de Conducir se consultó como referencia de formato, sin copiar su banco.
+Es material educativo independiente, de redacción propia: **no es un banco oficial ni garantiza aprobar**. El simulacro de hasta 40 preguntas y su porcentaje son decisiones de entrenamiento, no una descripción del examen del municipio. El cuestionario de Buenos Aires sirve como referencia de temas y señales; no se importan sus reglas locales a Mendoza. Test de Conducir se consultó como referencia de formato, sin copiar su banco.
 
 Las preguntas provinciales de velocidad se basan en el art. 60 de la Ley 9024 enlazada: motos 80 rural / 100 semiautopista / 120 autopista; en Nación se usa el art. 51 de la Ley 24.449: 110 / 120 / 130. Ambas contemplan condiciones y señalización. No usar los valores provinciales como regla para cualquier ruta nacional.
 
@@ -49,3 +49,13 @@ Las señales son ilustraciones vectoriales propias para estudio; no son láminas
 ## Validación
 
 Se revisaron integridad de IDs/opciones/fuentes, carga sin dependencias, corrección después de mezclar, bloqueo de respuestas repetidas, reinicio, persistencia, filtros, resultados y funcionamiento en pantalla móvil. Las limitaciones de revisión de contenido están descritas arriba.
+
+## Ampliación para San Rafael (15/10/2026)
+
+Se incorporaron 36 preguntas, cuatro símbolos ilustrados y once fuentes adicionales (20 en total). Se conservaron los IDs originales para respetar el progreso guardado. La pregunta q016 ahora define ciclomotor expresamente. Si retomás un intento de la versión anterior, conserva sus preguntas; pulsá **Nueva práctica** para incluir el banco ampliado.
+
+La pestaña **Rendir en San Rafael** distingue cursos y fuentes municipales de la referencia nacional: Disposición ANSV 219/2025, anexo I, título III (40 preguntas, mínimo 36 correctas, posibles eliminatorias, máximo 75 minutos fijado por el evaluador). Esta disposición reemplaza el anexo de la 54/2025. No se encontró confirmación municipal pública de esos números operativos para el teórico de moto de San Rafael. Las publicaciones municipales y sus materiales se enlazan en la página para consultar el turno y el circuito efectivamente asignado.
+
+El simulacro selecciona hasta 40 preguntas con un reparto propio para incluir temas variados. Mantiene corrección inmediata. No reproduce cupos oficiales, casos a desarrollar ni un listado oficial de eliminatorias, ni incorpora cronómetro. Si el filtro tiene menos de 40, utiliza las disponibles. La meta de 90% se presenta como orientación, sin certificar aprobación.
+
+Se incorporaron técnicas y equipamiento del manual de Rivadavia, sin importar sus tablas de velocidad ni sus requisitos de licencias. El material de San Rafael sobre pista es una guía alojada por el municipio, no una confirmación del trazado vigente en cada turno.

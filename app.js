@@ -32,7 +32,13 @@
     if(mode==='errors')pool=pool.filter(q=>state.errors.includes(q.id));
     if(mode==='bookmarks')pool=pool.filter(q=>state.bookmarks.includes(q.id));
     let chosen=shuffle(pool);
-    if(mode==='exam') chosen=chosen.slice(0,20);
+    if(mode==='exam') {
+      // Reparto de entrenamiento propio: incluir temas distintos sin cupos oficiales.
+      const groups=shuffle([...new Set(pool.map(q=>q.topic))]).map(t=>shuffle(pool.filter(q=>q.topic===t)));
+      chosen=[];
+      while(chosen.length<40 && groups.some(g=>g.length))for(const g of groups){if(g.length&&chosen.length<40)chosen.push(g.pop());}
+      chosen=shuffle(chosen);
+    }
     state.session=chosen.length?{mode,scope,topic,index:0,finished:false,items:chosen.map(q=>({id:q.id,order:shuffle(q.options.map(o=>o.id)),answer:null}))}:null;
     save();render();
   }
@@ -68,7 +74,7 @@
   function focusQuestion(){$('#question-heading')?.focus({preventScroll:true});if(window.innerWidth<651)$('#quiz-area').scrollIntoView({behavior:'auto',block:'start'});}
   function finish(){if(!state.session)return;state.session.finished=true;save();render();$('#results-heading')?.focus();}
   function results(){const s=state.session;const answered=s.items.filter(i=>i.answer!==null),good=answered.filter(i=>i.answer===bank.get(i.id).correct).length;const wrong=answered.length-good;$('#position').textContent='INTENTO FINALIZADO';const topics=[...new Set(s.items.map(i=>bank.get(i.id).topic))];$('#question-card').innerHTML=`<div class="results"><p class="eyebrow">CADA INTENTO SUMA</p><h2 id="results-heading" tabindex="-1">Tu práctica, en perspectiva.</h2><div class="score">${Math.round(good/s.items.length*100)}<small style="font-size:28px">%</small></div><p><strong>${good} correctas</strong> · ${wrong} incorrectas · ${s.items.length-answered.length} sin responder</p><p class="micro">Porcentaje sobre todas las preguntas del intento. Es una referencia de estudio; no certifica aprobación del examen oficial.</p><div class="result-breakdown">${topics.map(t=>{const group=s.items.filter(i=>bank.get(i.id).topic===t);return `<p><span>${escape(t)}</span><strong>${group.filter(i=>i.answer===bank.get(i.id).correct).length} / ${group.length}</strong></p>`;}).join('')}</div><div class="result-actions"><button class="primary" id="retry">Repetir y mezclar ↻</button><button class="secondary" id="review-errors" ${wrong?'':'disabled'}>Practicar estos errores</button><button class="text-button" id="review-attempt">Revisar el intento</button></div></div>`;$('#retry').onclick=()=>start({onlyIds:s.items.map(i=>i.id),forcePractice:s.mode==='errors'||s.mode==='bookmarks'});$('#review-errors').onclick=()=>{const ids=answered.filter(i=>i.answer!==bank.get(i.id).correct).map(i=>i.id);$('#mode').value='practice';start({onlyIds:ids,forcePractice:true});};$('#review-attempt').onclick=()=>{s.finished=false;s.index=0;save();render();focusQuestion();};}
-  function view(name){for(const v of ['practice','signs','sources'])$(`#${v}-view`).classList.toggle('hidden',name!==v);document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.view===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
+  function view(name){for(const v of ['practice','signs','method','sources'])$(`#${v}-view`).classList.toggle('hidden',name!==v);document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.view===name;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});}
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>view(b.dataset.view));
   const topics=[...new Set(QUESTIONS.map(q=>q.topic))].sort((a,b)=>a.localeCompare(b,'es'));
   for(const t of topics){const o=document.createElement('option');o.value=t;o.textContent=t;$('#topic').append(o);}
@@ -81,7 +87,7 @@
   $('#confirm-reset').onclick=()=>{state={errors:[],bookmarks:[],session:null};$('#mode').value='practice';$('#topic').value='all';$('#scope').value='mendoza';$('#reset-dialog').close();start();focusQuestion();};
   function gallery(){const query=$('#sign-search').value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();const found=SIGNS.filter(s=>(s.name+' '+s.category).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(query));$('#sign-gallery').innerHTML=found.length?found.map(s=>`<button class="sign-tile" data-sign="${s.id}"><span role="img" aria-label="${escape(s.name)}">${s.svg}</span><span class="tag">${s.category}</span><strong>${escape(s.name)}</strong><p>${escape(s.meaning)}</p><span class="micro">Practicar esta señal ↗</span></button>`).join(''):'<p>No se encontraron señales.</p>';document.querySelectorAll('[data-sign]').forEach(b=>b.onclick=()=>{const q=QUESTIONS.find(q=>q.sign===b.dataset.sign);$('#mode').value='practice';$('#topic').value='all';start({onlyIds:[q.id],forcePractice:true});view('practice');focusQuestion();});}
   $('#sign-search').oninput=gallery;
-  $('#sources-list').innerHTML=Object.values(SOURCES).map(s=>`<article class="source-item"><h3><a href="${s.url}" target="_blank" rel="noopener noreferrer">${escape(s.title)} ↗</a></h3><p>${escape(s.note)}</p></article>`).join('');
+  $('#sources-list').innerHTML=[...['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].map(k=>SOURCES[k]),...Object.entries(SOURCES).filter(([k])=>!['sanrafael','sanrafaelpractico','sanrafaelpista','senalesansv','estrella','metodologia','curso'].includes(k)).map(([,v])=>v)].map(s=>`<article class="source-item"><h3><a href="${s.url}" target="_blank" rel="noopener noreferrer">${escape(s.title)} ↗</a></h3><p>${escape(s.note)}</p></article>`).join('');
   if(state.session){$('#mode').value=state.session.mode;$('#topic').value=state.session.topic;$('#scope').value=state.session.scope;render();}else start();
   gallery();showStorage();view('practice');
 })();
