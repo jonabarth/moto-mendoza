@@ -36,7 +36,7 @@ El filtro muestra cuántas preguntas e imágenes son elegibles antes de iniciar.
 
 ## Preguntas del Gobierno de Buenos Aires
 
-Ninguna opción reproduce su cuestionario oficial. El material de Buenos Aires se consultó como referencia al elaborar preguntas propias. Se agregó «¿Preguntas oficiales de Buenos Aires?» con un enlace directo al PDF original. «Nación» designa una jurisdicción, no ese cuestionario. El enlace abre material de estudio, no un nuevo modo interactivo.
+El selector local «Guía de Buenos Aires» reúne las preguntas con imagen de señal del catálogo, elaboradas a partir de la guía y señalización consultadas. No reproduce un banco oficial ni importa reglas provinciales a Mendoza. El enlace del panel sigue llevando al PDF original.
 
 Fuente: https://www.gba.gob.ar/static/seguridadvial/docs/cuestionario.pdf
 

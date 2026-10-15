@@ -5,8 +5,8 @@
   const bank = new Map(QUESTIONS.map(q => [q.id, q]));
   const scopes = {mendoza:'Mendoza',national:'Nación',common:'Tema común'};
   const modes = {practice:'PRÁCTICA LIBRE',exam:'SIMULACRO DE ENTRENAMIENTO',errors:'REPASO DE ERRORES',bookmarks:'PREGUNTAS GUARDADAS'};
-  const materials={all:'Todo el material',course:'Solo curso ANSV',sanrafael:'Solo material de San Rafael',localcourse:'Curso ANSV + San Rafael'};
-  function matchesMaterial(q,origin){return origin==='all'||(origin==='localcourse'?q.materials.some(x=>x==='course'||x==='sanrafael'):q.materials.includes(origin));}
+  const materials={all:'Todo el material',course:'Solo curso ANSV',gba:'Guía de Buenos Aires',sanrafael:'Solo material de San Rafael',localcourse:'Curso ANSV + San Rafael'};
+  function matchesMaterial(q,origin){return origin==='all'||(origin==='localcourse'?q.materials.some(x=>x==='course'||x==='sanrafael'):origin==='gba'?Boolean(q.sign):q.materials.includes(origin));}
   let updateFilters=null;
   function materialNote(){
     const origin=$('#material').value,scope=$('#scope').value,topic=$('#topic').value;
@@ -14,6 +14,8 @@
     const total=QUESTIONS.filter(q=>matchesMaterial(q,origin)).length;
     $('#material-note').textContent=`${eligible.length} preguntas con estos filtros · ${eligible.filter(q=>q.sign).length} con imagen de señal. El material reúne ${total} preguntas antes de filtrar tema y jurisdicción. Pulsá Nueva práctica para aplicarlos.`;
   }
+  const gbaOption=document.createElement('option'); gbaOption.value='gba'; gbaOption.textContent='Guía de Buenos Aires'; $('#material').insertBefore(gbaOption,$('#material').querySelector('option[value="sanrafael"]'));
+  const gbaHelp=document.querySelector('.gba-help'); if(gbaHelp){gbaHelp.querySelector('summary').textContent='¿Qué incluye Guía de Buenos Aires?'; gbaHelp.querySelector('p').textContent='Este filtro reúne las preguntas propias de la app basadas en la guía y señalización de Buenos Aires. No copia ni reproduce un banco oficial; sus reglas provinciales no se aplican automáticamente a Mendoza.';}
   let state = {errors:[],bookmarks:[],session:null};
   let storageOK = true;
   try {

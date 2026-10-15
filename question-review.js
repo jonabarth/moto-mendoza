@@ -309,5 +309,13 @@
     ['q120','¿Qué información anticipa esta señal preventiva?','La proximidad de un semáforo.','La obligación de detenerse en el punto donde está la señal.','La existencia de una onda verde que asegura el paso sin detenerse.']
   ];
   for(const [id,prompt,correct,w1,w2] of signalCases){const q=byId.get(id);q.prompt=prompt;q.options=[{id:'a',text:correct},{id:'b',text:w1},{id:'c',text:w2}];q.revision='2';}
+  const sendaNotes={
+    q084:['Según la ficha H5 del catálogo, ¿a qué corresponde esta demarcación?','La imagen sola no muestra un pictograma de peatón o bicicleta. El catálogo la clasifica como H5, senda peatonal; H6 es la clasificación para ciclistas.'],
+    q272:['La imagen muestra una variante con cebrado. ¿Qué denominación le da el catálogo?','El cebrado son las franjas blancas continuas. La lámina no incluye un dibujo de bicicleta; la diferencia entre H5 y H6 depende de la clasificación y del uso previsto.'],
+    q273:['La imagen muestra una variante sin cebrado. ¿Qué denominación le da el catálogo?','El catálogo la identifica como senda para ciclistas H6. La imagen no lleva un pictograma de bicicleta y puede parecerse a la senda peatonal H5.'],
+    q274:['La imagen muestra una variante para ciclistas con cebrado. ¿Qué denominación le da el catálogo?','El catálogo la identifica como senda para ciclistas con cebrado H6. La imagen no lleva un pictograma de bicicleta; el uso previsto y la ficha H6 completan la identificación.']
+  };
+  for(const [id,[prompt,explanation]] of Object.entries(sendaNotes)){const q=byId.get(id);if(q){q.prompt=prompt;q.explanation=explanation;q.revision='2';}}
+  const q084=byId.get('q084'); if(q084){q084.options=[{id:'a',text:'Senda peatonal'},{id:'b',text:'Senda peatonal con cebrado'},{id:'c',text:'Senda para ciclistas'}];q084.correct='a';}
   window.QUESTION_REVIEW={version:'2',date:'2026-10-15',reworded:QUESTIONS.filter(q=>q.revision==='2').length,courseSigns:Object.keys(courseSigns).length};
 })();
